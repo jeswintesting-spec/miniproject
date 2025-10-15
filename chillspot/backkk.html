@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChillSpot - BACK | Enhanced Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('back.jpeg') no-repeat center center;
+            background-size: cover;
+        }
+
+        /* --- Custom Animations --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        
+        /* Initial state for staggered animation */
+        .activity-card {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+          <a href="backkk.html" class="text-2xl font-bold text-teal-600 transition-colors hover:text-teal-700">
+            ChillSpot CUCEK
+          </a>
+          
+          <!-- Logout Button -->
+          <button id="logoutBtn"
+            class="bg-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-teal-700 transition">
+            Logout
+          </button>
+        </nav>
+      </header>
+      
+
+    <section class="hero-section text-white py-24">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 fade-in-up" style="animation-delay: 100ms;">Find Your Perfect Break</h1>
+            <p class="text-lg md:text-xl mb-8 fade-in-up" style="animation-delay: 200ms;">Smart, mood-based suggestions for your downtime at CUCEK.</p>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-10 fade-in-up" style="animation-delay: 300ms;">
+            <h2 class="text-2xl font-bold mb-6">What are you in the mood for?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label for="mood-filter" class="block text-sm font-medium text-gray-700 mb-1">Mood</label>
+                    <select id="mood-filter" class="w-full p-3 border border-gray-300 rounded-lg transition duration-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                        <option value="all">All</option>
+                        <option value="calm">Calm & Relaxed</option>
+                        <option value="energetic">Energetic & Fun</option>
+                        <option value="social">Social & Engaging</option>
+                        <option value="focused">Focused & Quiet</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="time-filter" class="block text-sm font-medium text-gray-700 mb-1">Time Available</label>
+                    <select id="time-filter" class="w-full p-3 border border-gray-300 rounded-lg transition duration-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                        <option value="all">Any</option>
+                        <option value="15">Under 15 mins</option>
+                        <option value="30">Under 30 mins</option>
+                        <option value="60">Under 1 hour</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="location-filter" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <select id="location-filter" class="w-full p-3 border border-gray-300 rounded-lg transition duration-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                        <option value="all">Anywhere on Campus</option>
+                        <option value="library">Library</option>
+                        <option value="common-room">Common Room</option>
+                        <option value="sports-ground">Sports Ground</option>
+                        <option value="canteen">Canteen</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="activity-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 ChillSpot CUCEK. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">A project for Cochin University College of Engineering, Kuttanad.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Mock Data for Activities ---
+        const activities = [
+            { title: "Library", description: "Check our current hours, find an open seat, and see the latest library news. The perfect way to plan your visit.", mood: "calm", time: 15, location: "library", icon: "📚", link:"cuceklibrary/library.html" },
+            { title: "lab facility", description: "Easily find out if the lab is open right now and also check whether it is crowded, so you can plan your visit without inconvenience.", mood: "focused", time: 30, location: "any", icon: " 💻" ,link:"cuceklabs/labindex.html"},
+            { title: "Online fun", description: "Browse our world of simple, one-tap games. Perfect for a quick dose of fun without any stress..", mood: "energetic", time: 30, location: "common-room", icon: "🎯🎮🕹️", link: "onlinefun.html"},
+            { title: "Sports Hub", description: "Discover our range of sports, check court availability, and see team practice times. Your complete guide to getting active at college.", mood: "energetic", time: 15, location: "sports-ground", icon: "🏀🏟️",link:"cuceksportshub/sportshub.html" },
+            { title: "events", description: "Discover what's happening on campus, from guest lectures to cultural nights. Never miss a moment of the action.", mood: "social", time: 60, location: "common-room", icon: "🎯",link:"cucekevents/events.html" },
+            { title: "Catch up at the Canteen", description: "Grab a tea or coffee with friends and have a chat at the campus canteen and to know what's there to fill your tummy.", mood: "social", time: 30, location: "canteen", icon: "☕", link:"cucekcanteen/canteenindex.html"},
+            { title: "Chat and find", description: "find the perfect one to spend your time, check whos available now", mood: "calm", time: 60, location: "any", icon: "💬",link:"chat/chat_module.php" },
+
+        ];
+
+        // --- DOM Elements ---
+        const activityGrid = document.getElementById('activity-grid');
+        const moodFilter = document.getElementById('mood-filter');
+        const timeFilter = document.getElementById('time-filter');
+        const locationFilter = document.getElementById('location-filter');
+        // Login-related DOM elements were here
+
+        // --- Functions ---
+
+        /**
+         * Renders the activity cards on the page with animations.
+         * @param {Array} filteredActivities - The activities to display.
+         */
+        function renderActivities(filteredActivities) {
+            activityGrid.innerHTML = '';
+            if (filteredActivities.length === 0) {
+                activityGrid.innerHTML = `<p class="text-gray-500 col-span-3 text-center fade-in-up">No activities match your criteria. Try different filters!</p>`;
+                return;
+            }
+            filteredActivities.forEach((activity, index) => {
+                const card = `
+    <div onclick="window.location.href='${activity.link}'" 
+         class="activity-card cursor-pointer bg-white rounded-lg shadow-lg p-6 flex flex-col transition-all duration-300 ease-in-out transform hover:-translate-y-2 hover:shadow-xl"
+         style="animation-delay: ${index * 75}ms;">
+        <div class="text-5xl mb-4">${activity.icon}</div>
+        <h3 class="text-xl font-bold mb-2 text-gray-900">${activity.title}</h3>
+        <p class="text-gray-600 flex-grow">${activity.description}</p>
+        <div class="mt-6 pt-4 border-t border-gray-200 flex justify-between text-sm text-gray-500 font-medium">
+            <span class="bg-gray-200 px-2 py-1 rounded-full">${activity.mood.charAt(0).toUpperCase() + activity.mood.slice(1)}</span>
+            <span class="flex items-center">${activity.time} min</span>
+        </div>
+    </div>
+`;
+                activityGrid.innerHTML += card;
+            });
+            // Trigger the animation for each card
+             document.querySelectorAll('.activity-card').forEach(card => {
+                card.classList.add('fade-in-up');
+            });
+        }
+
+        /**
+         * Filters the activities based on the selected criteria.
+         */
+        function filterActivities() {
+            const selectedMood = moodFilter.value;
+            const selectedTime = timeFilter.value;
+            const selectedLocation = locationFilter.value;
+
+            const filtered = activities.filter(activity => {
+                const moodMatch = selectedMood === 'all' || activity.mood === selectedMood;
+                const timeMatch = selectedTime === 'all' || activity.time <= parseInt(selectedTime);
+                const locationMatch = selectedLocation === 'all' || activity.location === selectedLocation || activity.location === 'any';
+                return moodMatch && timeMatch && locationMatch;
+            });
+
+            renderActivities(filtered);
+        }
+        
+        // --- Modal Control functions were here ---
+
+        // --- Event Listeners ---
+        moodFilter.addEventListener('change', filterActivities);
+        timeFilter.addEventListener('change', filterActivities);
+        locationFilter.addEventListener('change', filterActivities);
+
+        // Login-related event listeners were here
+
+
+        // --- Initial Render ---
+        document.addEventListener('DOMContentLoaded', () => {
+             renderActivities(activities);
+        });
+    </script>
+    <script>
+        // Logout button redirects to login.html
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          window.location.href = "login.html";
+        });
+      </script>
+      
+</body>
+</html>

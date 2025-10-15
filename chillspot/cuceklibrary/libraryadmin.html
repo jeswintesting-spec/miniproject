@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Library Panel | ChillSpot CUCEK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+
+  <!-- HEADER -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+      <a href="#" class="text-2xl font-bold text-teal-600 hover:text-teal-700 transition">
+        ChillSpot CUCEK
+      </a>
+      <button id="logoutBtn" class="bg-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-teal-700 transition">
+        Logout
+      </button>
+    </nav>
+  </header>
+
+  <main class="container mx-auto px-6 py-8">
+    <h1 class="text-2xl font-semibold mb-6">Library Admin Panel</h1>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+
+      <!-- Library Status & Crowd -->
+      <section class="bg-white rounded-lg shadow p-6 space-y-6">
+        <h2 class="text-xl font-semibold mb-4 text-teal-700">Library Settings</h2>
+
+        <!-- Status -->
+        <div class="space-y-2">
+          <label class="font-medium">Library Status</label>
+          <select id="libraryStatus" class="w-full px-3 py-2 border rounded-md">
+            <option value="auto">Auto</option>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input type="text" id="customLibraryStatus" placeholder="Enter custom status" class="w-full px-3 py-2 border rounded-md hidden">
+          <button onclick="saveStatus()" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">Save Status</button>
+        </div>
+
+        <!-- Crowd -->
+        <div class="space-y-2">
+          <label class="font-medium">Crowd Level</label>
+          <select id="crowdLevel" class="w-full px-3 py-2 border rounded-md">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+          <button onclick="saveCrowd()" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">Save Crowd Level</button>
+        </div>
+      </section>
+
+      <!-- Notifications -->
+      <section class="bg-white rounded-lg shadow p-6 space-y-4">
+        <h2 class="text-xl font-semibold mb-4 text-teal-700">Manage Notifications</h2>
+
+        <form id="notifForm" class="space-y-3">
+          <input id="notificationInput" type="text" placeholder="Notification text" class="w-full px-3 py-2 border rounded-md" required>
+          <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">Add Notification</button>
+        </form>
+
+        <ul id="notificationList" class="divide-y"></ul>
+      </section>
+
+      <!-- Books Management -->
+      <section class="bg-white rounded-lg shadow p-6 space-y-4 lg:col-span-2">
+        <h2 class="text-xl font-semibold mb-4 text-teal-700">Manage Books</h2>
+
+        <form id="bookForm" class="grid lg:grid-cols-3 gap-3 mb-4">
+          <input id="bookTitle" type="text" placeholder="Title" class="px-3 py-2 border rounded-md" required>
+          <input id="bookAuthor" type="text" placeholder="Author" class="px-3 py-2 border rounded-md" required>
+          <input id="bookYear" type="text" placeholder="Year" class="px-3 py-2 border rounded-md" required>
+          <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 lg:col-span-3">Add Book</button>
+        </form>
+
+        <ul id="bookList" class="divide-y"></ul>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    const API_URL = 'api.php';
+
+    async function postData(data) {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        return await response.json();
+      } catch (err) {
+        console.error(err);
+        alert("Error connecting to server.");
+      }
+    }
+
+    // --- STATUS ---
+    async function saveStatus() {
+      const status = document.getElementById('libraryStatus').value;
+      const customText = document.getElementById('customLibraryStatus').value;
+      await postData({ action: 'saveStatus', status, customText });
+      alert("✅ Library status updated!");
+    }
+
+    document.getElementById("libraryStatus").addEventListener("change", function() {
+      document.getElementById("customLibraryStatus").classList.toggle("hidden", this.value !== "custom");
+    });
+
+    // --- CROWD ---
+    async function saveCrowd() {
+      const level = document.getElementById("crowdLevel").value;
+      await postData({ action: 'saveCrowd', level });
+      alert("✅ Crowd level updated!");
+    }
+
+    // --- NOTIFICATIONS ---
+    const notifForm = document.getElementById('notifForm');
+    notifForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const text = document.getElementById('notificationInput').value.trim();
+      if (!text) return alert("Enter a message!");
+      await postData({ action: 'addNotification', message: text });
+      document.getElementById('notificationInput').value = '';
+      loadData();
+    });
+
+    function renderNotifications(list){
+      const el = document.getElementById("notificationList");
+      el.innerHTML = list.length ? '' : '<p class="text-gray-500 italic">No notifications.</p>';
+      list.forEach((n, idx) => {
+        const li = document.createElement('li');
+        li.className = 'py-2 flex justify-between items-center';
+        li.innerHTML = `
+          <span>${n.message}</span>
+          <button class="text-red-600 hover:underline text-sm">Delete</button>
+        `;
+        li.querySelector('button').addEventListener('click', async () => {
+          await postData({ action: 'removeNotification', id: n.id });
+          loadData();
+        });
+        el.appendChild(li);
+      });
+    }
+
+    // --- BOOKS ---
+    const bookForm = document.getElementById('bookForm');
+    bookForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const title = document.getElementById('bookTitle').value.trim();
+      const author = document.getElementById('bookAuthor').value.trim();
+      const year = document.getElementById('bookYear').value.trim();
+      if (!title || !author || !year) return alert("Fill all fields!");
+      await postData({ action: 'addBook', title, author, year });
+      bookForm.reset();
+      loadData();
+    });
+
+    function renderBooks(list){
+      const el = document.getElementById("bookList");
+      el.innerHTML = list.length ? '' : '<p class="text-gray-500 italic">No books added.</p>';
+      list.forEach((b, idx) => {
+        const li = document.createElement('li');
+        li.className = 'py-2 flex justify-between items-center';
+        li.innerHTML = `<span>${b.title} by ${b.author} (${b.publication_year})</span>
+          <button class="text-red-600 hover:underline text-sm">Delete</button>`;
+        li.querySelector('button').addEventListener('click', async () => {
+          await postData({ action: 'removeBook', id: b.id });
+          loadData();
+        });
+        el.appendChild(li);
+      });
+    }
+
+    // --- LOAD DATA ---
+    async function loadData(){
+      const res = await fetch(`${API_URL}?action=getAllData`);
+      const data = await res.json();
+
+      document.getElementById('libraryStatus').value = data.settings.libraryStatus;
+      document.getElementById('customLibraryStatus').value = data.settings.customLibraryStatus;
+      document.getElementById('crowdLevel').value = data.settings.crowdLevel;
+      document.getElementById("libraryStatus").dispatchEvent(new Event('change'));
+
+      renderNotifications(data.notifications);
+      renderBooks(data.books);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      window.location.href = '../login.html';
+    });
+
+    window.onload = loadData;
+  </script>
+</body>
+</html>
