@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sports Hub | ChillSpot CUCEK</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  body {
+    font-family: "Inter", sans-serif;
+
+    /* ✅ Background with gradient + image */
+    background:
+      url("https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=3107")
+      no-repeat center center fixed,
+      linear-gradient(to bottom right, rgba(15, 118, 110, 0.85), rgba(19, 78, 74, 0.85));
+    background-size: cover;
+    color: #fff;
+  }
+
+  .overlay {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(5px);
+    min-height: 100vh;
+  }
+
+  /* ✅ Glass card styling */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(15px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 18px;
+    padding: 20px;
+    transition: all 0.35s ease;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  }
+
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  }
+</style>
+</head>
+
+<body>
+<div class="overlay flex flex-col min-h-screen">
+
+  <!-- ✅ HEADER -->
+  <header class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="../backkk.html" class="text-2xl font-bold text-white hover:text-gray-200 transition">
+        ChillSpot CUCEK
+      </a>
+    </nav>
+  </header>
+
+  <!-- ✅ HERO -->
+  <section class="text-center py-20">
+    <h1 class="text-5xl font-bold mb-3 drop-shadow-lg">Sports Hub</h1>
+    <p class="text-lg text-gray-200 max-w-2xl mx-auto">
+      Stay updated with sports events, results and notifications across campus.
+    </p>
+  </section>
+
+  <!-- ✅ MAIN CONTENT TWO-SIDE -->
+  <main class="container mx-auto px-6 pb-16 flex-grow">
+
+    <div class="flex flex-col lg:flex-row gap-12">
+
+      <!-- ✅ UPCOMING EVENTS (Left section) -->
+      <section class="flex-1 glass-card">
+        <h2 class="text-3xl font-semibold mb-6 text-teal-300 drop-shadow-md">
+          Upcoming Events
+        </h2>
+
+        <div id="eventsList" class="space-y-6">
+          <p class="text-center italic text-gray-300">Loading events...</p>
+        </div>
+
+        <p id="noEvents" class="hidden text-gray-200 italic mt-4 text-center">
+          No events currently listed.
+        </p>
+      </section>
+
+      <!-- ✅ NOTIFICATIONS (Right section - sticky) -->
+      <aside class="w-full lg:w-96 glass-card sticky top-24 h-fit">
+        <h3 class="text-2xl font-semibold mb-4 text-teal-300 drop-shadow-md">
+          Notifications
+        </h3>
+
+        <ul id="notificationsList" class="divide-y divide-gray-300/30">
+          <li class="py-2 text-center italic text-gray-300">Loading...</li>
+        </ul>
+
+        <p id="noNotif" class="hidden text-gray-200 italic mt-3 text-center">
+          No notifications yet.
+        </p>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ✅ FOOTER -->
+  <footer class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 py-6 text-center text-white text-sm mt-auto">
+    <p>&copy; 2025 ChillSpot CUCEK. All rights reserved.</p>
+    <p class="text-gray-300 mt-1">Cochin University College of Engineering, Kuttanad.</p>
+  </footer>
+</div>
+
+<!-- ✅ FETCH DATA SCRIPT -->
+<script>
+async function loadData() {
+  /* ---- ✅ Notifications ---- */
+  const notifDiv = document.getElementById("notificationsList");
+  const noNotif = document.getElementById("noNotif");
+
+  try {
+    const notifRes = await fetch("api.php?action=notifications");
+    const notifications = await notifRes.json();
+    notifDiv.innerHTML = "";
+
+    if (notifications.length === 0) {
+      noNotif.classList.remove("hidden");
+    } else {
+      notifications.forEach(n => {
+        notifDiv.innerHTML += `<li class="py-3 text-gray-100">${n.message}</li>`;
+      });
+    }
+  } catch {
+    notifDiv.innerHTML = "<li class='text-center text-red-400 py-3'>Failed to load notifications.</li>";
+  }
+
+  /* ---- ✅ Events ---- */
+  const eventDiv = document.getElementById("eventsList");
+  const noEvents = document.getElementById("noEvents");
+
+  try {
+    const eventRes = await fetch("api.php?action=events");
+    const events = await eventRes.json();
+    eventDiv.innerHTML = "";
+
+    if (events.length === 0) {
+      noEvents.classList.remove("hidden");
+    } else {
+      events.forEach(ev => {
+        eventDiv.innerHTML += `
+        <div class="bg-white/20 p-5 rounded-xl border border-white/30 shadow-lg">
+          <h3 class="text-xl font-bold text-white mb-1">${ev.title}</h3>
+          <p class="text-gray-200 text-sm"><strong>📅 Date:</strong> ${ev.date}</p>
+          <p class="text-gray-200 text-sm"><strong>🕒 Time:</strong> ${ev.time}</p>
+          <p class="text-gray-100 mt-3">${ev.description || ""}</p>
+        </div>`;
+      });
+    }
+  } catch {
+    eventDiv.innerHTML = "<p class='text-center text-red-400'>Failed to load events.</p>";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadData);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Events & Notifications | ChillSpot CUCEK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+
+<header class="bg-white shadow-md sticky top-0 z-50">
+  <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+    <a href="#" class="text-2xl font-bold text-teal-600 transition-colors hover:text-teal-700">
+      ChillSpot CUCEK
+    </a>
+    <button id="logoutBtn"
+      class="bg-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-teal-700 transition">
+      Logout
+    </button>
+  </nav>
+</header>
+
+<main class="container mx-auto px-6 py-8">
+  <h1 class="text-2xl font-semibold mb-6">Admin Panel</h1>
+
+  <div class="grid lg:grid-cols-2 gap-8">
+
+    <!-- Events Management -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold mb-4 text-teal-700">Manage Events</h2>
+
+      <form id="eventForm" class="space-y-3 mb-6">
+        <input id="evTitle" type="text" placeholder="Event Title" class="w-full px-3 py-2 border rounded-md" required>
+        <div class="grid grid-cols-2 gap-3">
+          <input id="evDate" type="date" class="px-3 py-2 border rounded-md" required>
+          <input id="evTime" type="time" class="px-3 py-2 border rounded-md">
+        </div>
+        <textarea id="evDesc" placeholder="Description" rows="3" class="w-full px-3 py-2 border rounded-md"></textarea>
+        <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">Add Event</button>
+      </form>
+
+      <ul id="eventsList" class="divide-y"></ul>
+    </section>
+
+    <!-- Notifications Management -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold mb-4 text-teal-700">Manage Notifications</h2>
+
+      <form id="notifForm" class="space-y-3 mb-6">
+        <input id="notifText" type="text" placeholder="Notification Text" class="w-full px-3 py-2 border rounded-md" required>
+        <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">Add Notification</button>
+      </form>
+
+      <ul id="notifList" class="divide-y"></ul>
+    </section>
+
+  </div>
+</main>
+
+<script>
+const eventsList = document.getElementById('eventsList');
+const notifList = document.getElementById('notifList');
+
+// Render Events
+async function renderEvents() {
+    const res = await fetch('api.php?action=getEvents');
+    const events = await res.json();
+    eventsList.innerHTML = events.length ? '' : '<p class="text-gray-500 italic">No events added.</p>';
+    events.forEach(ev => {
+        const li = document.createElement('li');
+        li.className = 'py-3 flex justify-between items-start';
+        li.innerHTML = `
+            <div>
+              <p class='font-semibold text-gray-800'>${ev.title}</p>
+              <p class='text-sm text-gray-500'>${ev.date} ${ev.time || ''}</p>
+              <p class='text-sm text-gray-600 mt-1'>${ev.description || ''}</p>
+            </div>
+            <button class='text-red-600 hover:underline text-sm'>Delete</button>
+        `;
+        li.querySelector('button').addEventListener('click', async ()=>{
+            if(confirm('Are you sure you want to delete this event?')) {
+                await fetch(`api.php?action=deleteEvent&id=${ev.id}`);
+                renderEvents();
+            }
+        });
+        eventsList.appendChild(li);
+    });
+}
+
+// Render Notifications
+async function renderNotifs() {
+    const res = await fetch('api.php?action=getNotifs');
+    const notifs = await res.json();
+    notifList.innerHTML = notifs.length ? '' : '<p class="text-gray-500 italic">No notifications.</p>';
+    notifs.forEach(n => {
+        const li = document.createElement('li');
+        li.className = 'py-3 flex justify-between items-center';
+        li.innerHTML = `
+            <span class='text-gray-800 text-sm'>${n.text}</span>
+            <button class='text-red-600 hover:underline text-sm'>Delete</button>
+        `;
+        li.querySelector('button').addEventListener('click', async ()=>{
+            if(confirm('Are you sure you want to delete this notification?')) {
+                await fetch(`api.php?action=deleteNotif&id=${n.id}`);
+                renderNotifs();
+            }
+        });
+        notifList.appendChild(li);
+    });
+}
+
+// Add Event
+document.getElementById('eventForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const title = document.getElementById('evTitle').value.trim();
+    const date = document.getElementById('evDate').value;
+    const time = document.getElementById('evTime').value;
+    const desc = document.getElementById('evDesc').value.trim();
+    if(!title || !date) return alert('Please provide event title and date.');
+    await fetch('api.php?action=addEvent', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({title,date,time,desc})
+    });
+    e.target.reset();
+    renderEvents();
+});
+
+// Add Notification
+document.getElementById('notifForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const text = document.getElementById('notifText').value.trim();
+    if(!text) return alert('Please enter notification text.');
+    await fetch('api.php?action=addNotif', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({text})
+    });
+    e.target.reset();
+    renderNotifs();
+});
+
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    // Optional: clear any session/local storage
+    // sessionStorage.clear();
+    // localStorage.clear();
+
+    // Redirect to login page
+    window.location.href = '../login.html';
+});
+
+// Initial Render
+renderEvents();
+renderNotifs();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CUCEK Library | ChillSpot</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background:
+        url("https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80")
+        no-repeat center center fixed,
+        linear-gradient(to bottom right, rgba(15,118,110,0.85), rgba(19,78,74,0.85));
+      background-size: cover;
+      color: #fff;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(6px);
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.20);
+      backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 18px;
+      transition: all 0.35s ease;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: translateY(-6px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: white;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+
+<body>
+<div class="overlay flex flex-col min-h-screen">
+
+  <!-- ✅ Header with Library Status + Crowd Level -->
+  <header class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+
+      <a href="../backkk.html" class="text-2xl font-bold text-white hover:text-gray-200 transition">
+        ChillSpot CUCEK
+      </a>
+
+      <div class="flex gap-3 items-center">
+        <!-- Library Status -->
+        <div id="library-status" class="status-badge bg-gray-400">
+          <span id="status-icon"><i class="fas fa-clock"></i></span>
+          <span id="status-text">Checking...</span>
+        </div>
+
+        <!-- ✅ Crowd Level moved to top -->
+        <div id="crowd-level" class="status-badge bg-gray-500 font-bold">
+          Loading...
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <section class="text-center py-16">
+    <h1 class="text-5xl font-bold drop-shadow-lg">Library Dashboard</h1>
+    <p class="text-gray-200 text-lg mt-3">Live crowd, announcements & new arrivals.</p>
+  </section>
+
+  <main class="container mx-auto px-6 pb-16 flex-grow">
+    <div class="flex flex-col lg:flex-row gap-12">
+
+      <!-- Books Section -->
+      <section class="flex-1 glass-card p-6">
+        <h2 class="text-3xl font-semibold mb-6 text-teal-300 drop-shadow-md">New Arrivals</h2>
+        <div id="book-section" class="space-y-6"></div>
+        <p id="noBooks" class="hidden text-gray-300 italic mt-4">No new arrivals.</p>
+      </section>
+
+      <!-- Announcements Section -->
+      <aside class="w-full lg:w-96 glass-card p-6 sticky top-24">
+        <h3 class="text-2xl font-semibold mb-4 text-teal-300 drop-shadow-md">Announcements</h3>
+        <ul id="notifications-list" class="divide-y divide-gray-300/30"></ul>
+        <p id="noNotif" class="hidden text-gray-300 italic mt-3">No announcements.</p>
+      </aside>
+
+    </div>
+  </main>
+
+  <footer class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 py-6 text-center text-white text-sm mt-auto">
+    <p>© 2025 ChillSpot CUCEK</p>
+    <p class="text-gray-300 mt-1">Cochin University College of Engineering, Kuttanad.</p>
+  </footer>
+
+</div>
+
+<script>
+const API_URL = "api.php";
+
+async function loadData() {
+  const res = await fetch(`${API_URL}?action=getAllData`);
+  const data = await res.json();
+
+  const { libraryStatus, customLibraryStatus, crowdLevel } = data.settings;
+
+  // ✅ Library status update
+  const statusDiv = document.getElementById("library-status");
+  const statusText = document.getElementById("status-text");
+  const statusIcon = document.getElementById("status-icon");
+
+  if (libraryStatus === "open") {
+    statusDiv.className = "status-badge bg-green-500";
+    statusText.textContent = "Open";
+    statusIcon.innerHTML = '<i class="fas fa-door-open"></i>';
+  } else if (libraryStatus === "closed") {
+    statusDiv.className = "status-badge bg-red-500";
+    statusText.textContent = "Closed";
+    statusIcon.innerHTML = '<i class="fas fa-door-closed"></i>';
+  } else {
+    statusDiv.className = "status-badge bg-yellow-500";
+    statusText.textContent = customLibraryStatus || "Auto";
+    statusIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+  }
+
+  // ✅ Crowd level update with colors
+  const crowdDiv = document.getElementById("crowd-level");
+  if (crowdLevel === "Low") {
+    crowdDiv.className = "status-badge bg-green-500";
+    crowdDiv.textContent = "Low • Peaceful";
+  } else if (crowdLevel === "High") {
+    crowdDiv.className = "status-badge bg-red-500";
+    crowdDiv.textContent = "High • Busy";
+  } else if (crowdLevel === "Moderate") {
+    crowdDiv.className = "status-badge bg-orange-500";
+    crowdDiv.textContent = "Moderate • Normal";
+  } else {
+    crowdDiv.className = "status-badge bg-yellow-500";
+    crowdDiv.textContent = crowdLevel;
+  }
+
+  // ✅ Load Notifications
+  const notifList = document.getElementById("notifications-list");
+  notifList.innerHTML = "";
+  document.getElementById("noNotif").classList.toggle("hidden", data.notifications.length > 0);
+  data.notifications.forEach(n => {
+    notifList.innerHTML += `<li class='py-3 text-gray-100'>${n.message}</li>`;
+  });
+
+  // ✅ Load Books
+  const bookSection = document.getElementById("book-section");
+  bookSection.innerHTML = "";
+  document.getElementById("noBooks").classList.toggle("hidden", data.books.length > 0);
+  data.books.forEach(book => {
+    bookSection.innerHTML += `
+      <article class='glass-card p-5 rounded-xl'>
+        <h3 class='text-xl font-bold text-white'>${book.title}</h3>
+        <p class='text-gray-200'>${book.author}</p>
+        <p class='text-sm text-gray-300 mt-1'>Published: ${book.publication_year}</p>
+      </article>`;
+  });
+}
+
+loadData();
+setInterval(loadData, 60000);
+</script>
+
+</body>
+</html>

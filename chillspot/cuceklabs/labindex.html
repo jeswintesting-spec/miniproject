@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Labs | ChillSpot CUCEK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+
+      background:
+        url("https://images.unsplash.com/photo-1606206873764-fd15e242df52?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2940")
+        no-repeat center center fixed,
+        linear-gradient(to bottom right, rgba(15,118,110,0.85), rgba(19,78,74,0.85));
+      background-size: cover;
+      color: #fff;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      min-height: 100vh;
+    }
+
+    /* ✅ stronger glass feel */
+    .lab-card {
+      background: rgba(255, 255, 255, 0.20);
+      backdrop-filter: blur(15px) saturate(160%);
+      -webkit-backdrop-filter: blur(15px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+      border-radius: 18px;
+      transition: all 0.35s ease;
+    }
+
+    .lab-card:hover {
+      background: rgba(255, 255, 255, 0.32);
+      transform: translateY(-6px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay flex flex-col min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+      <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="../backkk.html" class="text-2xl font-bold text-white hover:text-gray-200 transition">
+          ChillSpot CUCEK
+        </a>
+      </nav>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="text-center py-20">
+      <h1 class="text-5xl font-bold mb-3 drop-shadow-lg">Campus Labs</h1>
+      <p class="text-lg text-gray-200 max-w-2xl mx-auto">
+        Check the live status of labs across campus — open labs, crowd info, and upcoming events.
+      </p>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow container mx-auto px-6 pb-16">
+      <h2 class="text-3xl font-semibold text-center text-teal-300 mb-10 drop-shadow-md">
+        Live Lab Status
+      </h2>
+
+      <div id="labs-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <p class="text-center text-gray-300 col-span-full">Loading labs...</p>
+      </div>
+
+      <p class="text-center text-gray-300 text-sm mt-8">
+        <i class="fas fa-rotate"></i> Auto-refreshes every 30 seconds
+      </p>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 py-6 text-center text-white text-sm mt-auto">
+      <p>&copy; 2025 ChillSpot CUCEK. All rights reserved.</p>
+      <p class="text-gray-300 mt-1">Cochin University College of Engineering, Kuttanad.</p>
+    </footer>
+  </div>
+
+  <script>
+    const API_URL = 'api.php';
+    const labsContainer = document.getElementById('labs-container');
+
+    async function fetchLabs() {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const labs = await response.json();
+        renderLabs(labs);
+      } catch (error) {
+        console.error('Error fetching labs:', error);
+        labsContainer.innerHTML = `
+          <p class="text-center text-red-400 col-span-full">
+            ⚠️ Failed to load labs. Please ensure server is running.
+          </p>`;
+      }
+    }
+
+    function renderLabs(labs) {
+      labsContainer.innerHTML = '';
+
+      if (Object.keys(labs).length === 0) {
+        labsContainer.innerHTML = `<p class="text-center text-gray-300 col-span-full">No labs found.</p>`;
+        return;
+      }
+
+      Object.values(labs).forEach(lab => {
+        const statusBadge = lab.status === 'Open'
+          ? `<span class="status-badge bg-green-500 text-white"><i class="fas fa-door-open"></i> Open</span>`
+          : `<span class="status-badge bg-red-500 text-white"><i class="fas fa-door-closed"></i> Closed</span>`;
+
+        const crowdEmoji =
+          lab.crowd === 'Low' ? '🙂' :
+          lab.crowd === 'Moderate' ? '😐' :
+          '😓';
+
+        const labIcon =
+          lab.type?.toLowerCase().includes('computer') ? '💻' :
+          lab.type?.toLowerCase().includes('physics') ? '⚛️' :
+          lab.type?.toLowerCase().includes('chemistry') ? '🧪' :
+          lab.type?.toLowerCase().includes('biology') ? '🧬' :
+          '🧪';
+
+        labsContainer.innerHTML += `
+          <div class="lab-card p-6">
+            <h3 class="text-xl font-bold text-white mb-4">${labIcon} ${lab.name}</h3>
+
+            <div class="flex justify-between mb-3">
+              <span class="font-semibold">Status:</span>
+              ${statusBadge}
+            </div>
+
+            <div class="flex justify-between mb-3">
+              <span class="font-semibold">Crowd Level:</span>
+              <span class="font-semibold">${crowdEmoji} ${lab.crowd}</span>
+            </div>
+
+            <div>
+              <span class="font-semibold block mb-1">Upcoming Event:</span>
+              <p class="text-gray-200 text-sm">${lab.event || "<em>No upcoming events</em>"}</p>
+            </div>
+          </div>`;
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchLabs);
+    setInterval(fetchLabs, 30000);
+  </script>
+</body>
+</html>

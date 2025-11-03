@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sports Hub Admin</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Inter', sans-serif; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Header -->
+<header class="bg-white shadow-md sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+      <a href="sportshub.html" class="text-2xl font-bold text-teal-600 hover:text-teal-700">Sports Hub Admin</a>
+      <button onclick="window.location.href='../login.html'" 
+              class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+        Logout
+      </button>
+    </nav>
+  </header>
+  
+
+<section class="container mx-auto px-6 py-10">
+
+<h2 class="text-2xl font-bold text-teal-700 mb-6">Manage Notifications</h2>
+<div class="bg-white rounded-2xl shadow p-6 mb-10">
+<input id="notificationInput" type="text" placeholder="Enter new notification" class="border rounded px-3 py-2 w-full mb-3">
+<button onclick="addNotification()" class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700">Add Notification</button>
+<div id="notificationsAdmin" class="mt-4 space-y-2"></div>
+</div>
+
+<h2 class="text-2xl font-bold text-teal-700 mb-6">Manage Events</h2>
+<div class="bg-white rounded-2xl shadow p-6">
+<input id="eventTitle" type="text" placeholder="Event Title" class="border rounded px-3 py-2 w-full mb-3">
+<input id="eventLocation" type="text" placeholder="Location" class="border rounded px-3 py-2 w-full mb-3">
+<input id="eventDate" type="date" class="border rounded px-3 py-2 w-full mb-3">
+<input id="eventTime" type="time" class="border rounded px-3 py-2 w-full mb-3">
+<button onclick="addEvent()" class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700">Add Event</button>
+<div id="eventsAdmin" class="mt-4 space-y-2"></div>
+</div>
+
+</section>
+
+<script>
+async function loadAdminData() {
+    // Load Notifications
+    let notifDiv = document.getElementById("notificationsAdmin");
+    notifDiv.innerHTML = "";
+    try {
+        let notifRes = await fetch('api.php?action=notifications');
+        let notifications = await notifRes.json();
+        notifications.forEach(n => {
+            notifDiv.innerHTML += `
+            <div class="flex justify-between items-center bg-gray-100 p-2 rounded">
+                <span>${n.message}</span>
+                <button onclick="deleteNotification(${n.id})" class="text-red-500">Delete</button>
+            </div>`;
+        });
+    } catch (err) {
+        notifDiv.innerHTML = "<div class='text-red-500'>Failed to load notifications</div>";
+    }
+
+    // Load Events
+    let eventDiv = document.getElementById("eventsAdmin");
+    eventDiv.innerHTML = "";
+    try {
+        let eventRes = await fetch('api.php?action=events');
+        let events = await eventRes.json();
+        events.forEach(ev => {
+            eventDiv.innerHTML += `
+            <div class="flex justify-between items-center bg-gray-100 p-2 rounded">
+                <span>${ev.title} (${ev.date})</span>
+                <button onclick="deleteEvent(${ev.id})" class="text-red-500">Delete</button>
+            </div>`;
+        });
+    } catch (err) {
+        eventDiv.innerHTML = "<div class='text-red-500'>Failed to load events</div>";
+    }
+}
+
+async function addNotification() {
+    let val = document.getElementById("notificationInput").value;
+    if (!val.trim()) return;
+    await fetch('api.php?action=addNotification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: val })
+    });
+    document.getElementById("notificationInput").value = "";
+    loadAdminData();
+}
+
+async function deleteNotification(id) {
+    await fetch('api.php?action=deleteNotification', {
+        method: 'DELETE',
+        body: 'id=' + id
+    });
+    loadAdminData();
+}
+
+async function addEvent() {
+    let title = document.getElementById("eventTitle").value;
+    let location = document.getElementById("eventLocation").value;
+    let date = document.getElementById("eventDate").value;
+    let time = document.getElementById("eventTime").value;
+    if (!title || !location || !date || !time) return;
+
+    await fetch('api.php?action=addEvent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, location, date, time })
+    });
+
+    document.getElementById("eventTitle").value = "";
+    document.getElementById("eventLocation").value = "";
+    document.getElementById("eventDate").value = "";
+    document.getElementById("eventTime").value = "";
+    loadAdminData();
+}
+
+async function deleteEvent(id) {
+    await fetch('api.php?action=deleteEvent', {
+        method: 'DELETE',
+        body: 'id=' + id
+    });
+    loadAdminData();
+}
+
+document.addEventListener("DOMContentLoaded", loadAdminData);
+</script>
+
+</body>
+</html>

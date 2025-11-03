@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Canteen | ChillSpot CUCEK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: url("https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1600&q=80") 
+                  no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(3px);
+      min-height: 100vh;
+    }
+
+    .status-badge {
+      transition: background-color 0.3s ease-in-out;
+    }
+
+    .menu-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .notification {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay flex flex-col min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+      <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="../backkk.html" class="text-2xl font-bold text-white hover:text-gray-200 transition">
+          ChillSpot CUCEK
+        </a>
+      </nav>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="text-center py-20">
+      <h1 class="text-5xl font-bold mb-3 drop-shadow-lg">Campus Canteen</h1>
+      <p class="text-lg text-gray-200 max-w-2xl mx-auto">
+        Fresh, tasty, and always student-friendly — check live status and today’s menu below.
+      </p>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow container mx-auto px-6 pb-16">
+
+      <!-- STATUS -->
+      <div id="canteen-status" class="status-badge bg-gray-600 text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center justify-center space-x-3 text-lg mb-10 max-w-sm mx-auto">
+        <span id="status-icon"><i class="fas fa-spinner fa-spin"></i></span>
+        <span id="status-text">Loading Status...</span>
+      </div>
+
+      <!-- NOTIFICATION -->
+      <div id="notification-banner" class="hidden notification border-l-4 border-yellow-400 text-yellow-100 p-4 rounded-lg mb-8 shadow-md flex justify-between items-center max-w-3xl mx-auto">
+        <div>
+          <p class="font-bold"><i class="fas fa-bell mr-2"></i>Special Announcement</p>
+          <p id="notification-text"></p>
+        </div>
+        <button onclick="dismissNotification()" class="text-yellow-300 hover:text-yellow-100">
+          <i class="fas fa-times-circle fa-lg"></i>
+        </button>
+      </div>
+
+      <!-- MENU -->
+      <h2 class="text-3xl font-semibold text-center text-teal-300 mb-6 drop-shadow-md">Today's Menu</h2>
+      <div id="menu-section" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <p class="text-center text-gray-300 col-span-3">Fetching menu from the kitchen...</p>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 py-6 text-center text-white text-sm mt-auto">
+      <p>&copy; 2025 ChillSpot CUCEK. All rights reserved.</p>
+      <p class="text-gray-300 mt-1">Cochin University College of Engineering, Kuttanad.</p>
+    </footer>
+
+  </div>
+
+  <script>
+    const API_URL = 'api.php';
+
+    function updateCanteenStatus(statusData) {
+      const statusDiv = document.getElementById('canteen-status');
+      const statusText = document.getElementById('status-text');
+      const statusIcon = document.getElementById('status-icon');
+      const { canteenStatus, customStatus } = statusData;
+
+      if (canteenStatus === "open") {
+        statusText.textContent = "Open Now";
+        statusDiv.className = "status-badge bg-green-500 text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center justify-center space-x-3 text-lg mb-10 max-w-sm mx-auto";
+        statusIcon.innerHTML = '<i class="fas fa-door-open"></i>';
+      } else if (canteenStatus === "closed") {
+        statusText.textContent = "Closed";
+        statusDiv.className = "status-badge bg-red-500 text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center justify-center space-x-3 text-lg mb-10 max-w-sm mx-auto";
+        statusIcon.innerHTML = '<i class="fas fa-door-closed"></i>';
+      } else if (canteenStatus === "custom" && customStatus) {
+        statusText.textContent = customStatus;
+        statusDiv.className = "status-badge bg-yellow-500 text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center justify-center space-x-3 text-lg mb-10 max-w-sm mx-auto";
+        statusIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+      }
+    }
+
+    function loadNotification(notificationMsg) {
+      if (notificationMsg && notificationMsg.trim() !== "") {
+        document.getElementById("notification-text").textContent = notificationMsg;
+        document.getElementById("notification-banner").classList.remove("hidden");
+      }
+    }
+
+    function dismissNotification() {
+      document.getElementById("notification-banner").classList.add("hidden");
+    }
+
+    function loadMenu(menuData) {
+      const section = document.getElementById("menu-section");
+      section.innerHTML = "";
+      if (menuData.length === 0) {
+        section.innerHTML = `<p class="text-center text-gray-200 col-span-3">Menu has not been set for today. Please check back later!</p>`;
+      } else {
+        menuData.forEach(item => {
+          section.innerHTML += `
+            <a href="#" class="menu-card block rounded-xl p-5 shadow-lg">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-2xl font-bold">${item.name}</h4>
+                <span class="text-teal-300 font-semibold text-lg">₹${parseFloat(item.price).toFixed(2)}</span>
+              </div>
+              <p class="text-gray-200 text-sm">${item.description || "Delicious and freshly made for you."}</p>
+            </a>`;
+        });
+      }
+    }
+
+    async function fetchAllData() {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Network error');
+        const data = await response.json();
+        updateCanteenStatus(data.status);
+        loadNotification(data.notification);
+        loadMenu(data.menu);
+      } catch (error) {
+        console.error("Failed to fetch canteen data:", error);
+        document.getElementById('status-text').textContent = "Server Error";
+        document.getElementById('menu-section').innerHTML = `<p class="text-center text-red-400 col-span-3">Could not connect to the server. Please ensure XAMPP is running.</p>`;
+      }
+    }
+
+    window.onload = function() {
+      fetchAllData();
+      setInterval(fetchAllData, 30000);
+    };
+  </script>
+
+</body>
+</html>

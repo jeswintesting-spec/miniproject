@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small Game List</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+
+            /* ✅ Same background aesthetic */
+            background:
+                url("https://plus.unsplash.com/premium_vector-1752078388457-a797a06acd6c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=3264")
+                no-repeat center center fixed,
+                linear-gradient(to bottom right, rgba(13,148,136,0.75), rgba(20,184,166,0.75));
+            background-size: cover;
+            color: white;
+        }
+
+        .overlay {
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+            min-height: 100vh;
+        }
+
+        /* ✅ Glass effect applied */
+        .game-card {
+            background: rgba(255, 255, 255, 0.20);
+            backdrop-filter: blur(15px) saturate(160%);
+            -webkit-backdrop-filter: blur(15px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.35s ease;
+            color: white;
+        }
+
+        .game-card:hover {
+            transform: translateY(-6px);
+            background: rgba(255, 255, 255, 0.32);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .header-gradient {
+            background: rgba(13,148,136,0.85);
+            backdrop-filter: blur(6px);
+        }
+    </style>
+</head>
+
+<body class="text-white">
+<div class="overlay flex flex-col min-h-screen">
+
+    <!-- Sticky Header -->
+    <header class="header-gradient shadow-lg sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="backkk.html" class="flex items-center space-x-2 hover:opacity-90 transition">
+                <div class="bg-white p-2 rounded-lg">
+                    <i class="fas fa-couch text-teal-600"></i>
+                </div>
+                <span class="text-2xl font-bold text-white">ChillSpot CUCEK</span>
+            </a>
+
+            <a href="backkk.html" class="text-white hover:text-gray-200 transition">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
+            </a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex items-center justify-center py-12 px-4 min-h-screen">
+        <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 md:p-12 rounded-2xl shadow-2xl w-full max-w-2xl">
+
+            <!-- Page Header -->
+            <div class="text-center mb-10">
+                <div class="inline-block bg-white/20 text-white rounded-full px-4 py-1 mb-4">
+                    <span class="text-sm font-medium">Quick Fun Breaks</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                    Classic <span class="text-teal-300">Games</span>
+                </h1>
+                <p class="text-gray-200 max-w-md mx-auto">
+                    Refresh your mind with quick classic games — perfect between classes.
+                </p>
+            </div>
+
+            <!-- Game Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Tetris -->
+                <a href="tetris.html" class="game-card group block p-6 rounded-xl text-center">
+                    <div class="mb-4 text-5xl text-purple-300">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Tetris</h3>
+                    <p class="text-sm text-gray-200 mb-4">Arrange falling blocks</p>
+                    <div class="bg-purple-200/30 text-purple-100 text-xs font-medium px-3 py-1 rounded-full inline-block">
+                        Puzzle Game
+                    </div>
+                </a>
+
+                <!-- Snake -->
+                <a href="snake.html" class="game-card group block p-6 rounded-xl text-center">
+                    <div class="mb-4 text-5xl text-green-300">
+                        <i class="fas fa-worm"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Snake</h3>
+                    <p class="text-sm text-gray-200 mb-4">Eat food. Grow longer.</p>
+                    <div class="bg-green-200/30 text-green-100 text-xs font-medium px-3 py-1 rounded-full inline-block">
+                        Arcade Classic
+                    </div>
+                </a>
+
+                <!-- Pong -->
+                <a href="pong.html" class="game-card group block p-6 rounded-xl text-center">
+                    <div class="mb-4 text-5xl text-yellow-300">
+                        <i class="fas fa-table-tennis-paddle-ball"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Pong</h3>
+                    <p class="text-sm text-gray-200 mb-4">Classic retro paddle game</p>
+                    <div class="bg-yellow-200/30 text-yellow-100 text-xs font-medium px-3 py-1 rounded-full inline-block">
+                        Sports Game
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/40 backdrop-blur-lg py-4 text-center text-white text-sm">
+        &copy; 2025 ChillSpot CUCEK. All rights reserved.
+    </footer>
+
+</div>
+</body>
+</html>

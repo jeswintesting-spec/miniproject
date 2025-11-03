@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Events & Notifications | ChillSpot CUCEK</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+
+      /* ✅ same background feel */
+      background:
+        url("https://plus.unsplash.com/premium_photo-1661306437817-8ab34be91e0c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2940")
+        no-repeat center center fixed,
+        linear-gradient(to bottom right, rgba(15,118,110,0.85), rgba(19,78,74,0.85));
+      background-size: cover;
+      color: #fff;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(6px);
+      min-height: 100vh;
+    }
+
+    /* ✅ GLASS CARD STYLE (matching Labs page) */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.20);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 18px;
+      transition: all 0.35s ease;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: translateY(-6px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+  </style>
+</head>
+
+<body>
+<div class="overlay flex flex-col min-h-screen">
+
+  <!-- ✅ HEADER -->
+  <header class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="../backkk.html" class="text-2xl font-bold text-white hover:text-gray-200 transition">
+        ChillSpot CUCEK
+      </a>
+    </nav>
+  </header>
+
+  <!-- ✅ HERO -->
+  <section class="text-center py-16">
+    <h1 class="text-5xl font-bold drop-shadow-lg">Events & Notifications</h1>
+    <p class="text-gray-200 text-lg mt-3">
+      Stay updated with what’s happening across campus.
+    </p>
+  </section>
+
+  <!-- ✅ MAIN CONTENT -->
+  <main class="container mx-auto px-6 pb-16 flex-grow">
+
+    <div class="flex flex-col lg:flex-row gap-12">
+
+      <!-- UPCOMING EVENTS -->
+      <section class="flex-1 glass-card p-6">
+        <h2 class="text-3xl font-semibold mb-6 text-teal-300 drop-shadow-md">
+          Upcoming Events
+        </h2>
+
+        <div id="eventsList" class="space-y-6"></div>
+        <p id="noEvents" class="hidden text-gray-300 italic mt-4">No events added yet.</p>
+      </section>
+
+      <!-- NOTIFICATIONS -->
+      <aside class="w-full lg:w-96 glass-card p-6 sticky top-24">
+        <h3 class="text-2xl font-semibold mb-4 text-teal-300 drop-shadow-md">
+          Notifications
+        </h3>
+
+        <ul id="notifList" class="divide-y divide-gray-300/30"></ul>
+        <p id="noNotif" class="hidden text-gray-300 italic mt-3">No notifications yet.</p>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ✅ FOOTER -->
+  <footer class="bg-gradient-to-r from-teal-700/90 to-teal-600/90 py-6 text-center text-white text-sm mt-auto">
+    <p>&copy; 2025 ChillSpot CUCEK. All rights reserved.</p>
+    <p class="text-gray-300 mt-1">Cochin University College of Engineering, Kuttanad.</p>
+  </footer>
+</div>
+
+
+<!-- ✅ FETCH API SCRIPT -->
+<script>
+const eventsList = document.getElementById('eventsList');
+const notifList = document.getElementById('notifList');
+const noEvents = document.getElementById('noEvents');
+const noNotif = document.getElementById('noNotif');
+
+async function fetchEvents() {
+    const res = await fetch('api.php?action=getEvents');
+    const events = await res.json();
+    eventsList.innerHTML = '';
+
+    if (events.length === 0) {
+      noEvents.classList.remove('hidden');
+      return;
+    }
+
+    events.forEach(ev => {
+        const card = document.createElement('article');
+        card.className = "bg-white/20 p-5 rounded-xl border border-white/20 shadow-md";
+        card.innerHTML = `
+          <h3 class="text-xl font-semibold text-white">${ev.title}</h3>
+          <p class="text-gray-200 text-sm mt-1">${ev.date} ${ev.time || ""}</p>
+          <p class="text-gray-100 mt-3">${ev.description || ""}</p>
+        `;
+        eventsList.appendChild(card);
+    });
+}
+
+async function fetchNotifs() {
+    const res = await fetch('api.php?action=getNotifs');
+    const notifs = await res.json();
+    notifList.innerHTML = '';
+
+    if (notifs.length === 0) {
+      noNotif.classList.remove('hidden');
+      return;
+    }
+
+    notifs.forEach(n => {
+        const li = document.createElement('li');
+        li.className = 'py-3 text-gray-100';
+        li.textContent = n.text;
+        notifList.appendChild(li);
+    });
+}
+
+fetchEvents();
+fetchNotifs();
+</script>
+
+</body>
+</html>

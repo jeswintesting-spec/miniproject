@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Canteen Panel | ChillSpot CUCEK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .input-field { @apply w-full border-gray-300 rounded-md px-3 py-2 shadow-sm focus:border-teal-500 focus:ring-teal-500 mb-2; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+
+  <!-- HEADER -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+      <span class="text-2xl font-bold text-teal-600">ChillSpot CUCEK</span>
+      <div>
+        <button id="logoutBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition font-semibold">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container mx-auto px-6 py-8 space-y-8">
+
+    <!-- Canteen Status -->
+    <section class="bg-white rounded-lg shadow p-6 space-y-4">
+      <h2 class="text-xl font-semibold text-teal-700">Canteen Status</h2>
+      <select id="canteenStatus" class="input-field">
+        <option value="open">Open Now</option>
+        <option value="closed">Closed</option>
+        <option value="custom">Custom Message</option>
+      </select>
+      <input id="customStatus" type="text" placeholder="Enter custom status message" class="input-field hidden">
+    </section>
+
+    <!-- Notification Banner -->
+    <section class="bg-white rounded-lg shadow p-6 space-y-4">
+      <h2 class="text-xl font-semibold text-teal-700">Notification Banner</h2>
+      <textarea id="notificationMessage" placeholder="e.g., Canteen will be closed at 2 PM for cleaning." class="input-field"></textarea>
+    </section>
+
+    <!-- Menu Items -->
+    <section class="bg-white rounded-lg shadow p-6 space-y-4">
+      <h2 class="text-xl font-semibold text-teal-700">Menu Items</h2>
+      <div class="grid lg:grid-cols-3 gap-3">
+        <input id="menuItemName" type="text" placeholder="Item name" class="input-field">
+        <input id="menuItemPrice" type="number" placeholder="Price ₹" class="input-field">
+        <button onclick="addMenuItem()" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">Add Item</button>
+      </div>
+      <h3 class="text-lg font-semibold mt-4">Current Menu</h3>
+      <ul id="menuList" class="divide-y mt-2"></ul>
+    </section>
+
+    <!-- Save All Changes -->
+    <div class="space-y-3">
+      <div id="notification" class="h-12"></div>
+      <button onclick="saveAllChanges()" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-bold text-lg">Save All Changes</button>
+    </div>
+
+  </main>
+
+  <script>
+    const API_URL = 'api.php';
+    let menu = [];
+
+    function renderMenu() {
+      const list = document.getElementById("menuList");
+      list.innerHTML = "";
+      if(menu.length === 0) {
+        list.innerHTML = '<li class="text-gray-500 italic py-2">No items in the menu. Add one above!</li>';
+        return;
+      }
+      menu.forEach((m, i) => {
+        const li = document.createElement('li');
+        li.className = 'py-2 flex justify-between items-center';
+        li.innerHTML = `
+          <span>${m.name} - ₹${parseFloat(m.price).toFixed(2)}</span>
+          <button class="text-red-600 hover:text-red-800 font-bold">&times;</button>
+        `;
+        li.querySelector('button').addEventListener('click', ()=> {
+          deleteMenuItem(i);
+        });
+        list.appendChild(li);
+      });
+    }
+
+    function addMenuItem() {
+      const name = document.getElementById("menuItemName").value.trim();
+      const price = document.getElementById("menuItemPrice").value.trim();
+      if (!name || !price) { alert("Please enter both an item name and a price."); return; }
+      menu.push({ name, price });
+      document.getElementById("menuItemName").value = "";
+      document.getElementById("menuItemPrice").value = "";
+      renderMenu();
+    }
+
+    function deleteMenuItem(index) {
+      menu.splice(index, 1);
+      renderMenu();
+    }
+
+    document.getElementById("canteenStatus").addEventListener("change", function() {
+      document.getElementById("customStatus").classList.toggle("hidden", this.value !== "custom");
+    });
+
+    async function loadInitialData() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        document.getElementById("canteenStatus").value = data.status.canteenStatus;
+        document.getElementById("customStatus").value = data.status.customStatus;
+        document.getElementById("notificationMessage").value = data.notification;
+        menu = data.menu;
+        
+        document.getElementById("canteenStatus").dispatchEvent(new Event('change'));
+        renderMenu();
+      } catch (error) {
+        console.error("Could not load initial data:", error);
+        alert("Error: Could not connect to the server. Is XAMPP running?");
+      }
+    }
+
+    async function saveAllChanges() {
+        const payload = {
+            status: {
+                canteenStatus: document.getElementById("canteenStatus").value,
+                customStatus: document.getElementById("customStatus").value
+            },
+            notification: document.getElementById("notificationMessage").value,
+            menu: menu
+        };
+        const notificationDiv = document.getElementById('notification');
+        notificationDiv.innerHTML = `<div class="bg-yellow-100 text-yellow-800 p-3 rounded-lg">Saving...</div>`;
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error('Server returned an error');
+            const result = await response.json();
+            if(!result.success) throw new Error(result.error);
+            notificationDiv.innerHTML = `<div class="bg-green-100 text-green-800 p-3 rounded-lg">✅ All changes saved successfully!</div>`;
+        } catch (error) {
+            console.error("Failed to save changes:", error);
+            notificationDiv.innerHTML = `<div class="bg-red-100 text-red-700 p-3 rounded-lg">❌ Failed to save changes.</div>`;
+        }
+        setTimeout(() => { notificationDiv.innerHTML = ''; }, 4000);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      window.location.href = '../login.html';
+    });
+
+    window.onload = loadInitialData;
+  </script>
+
+</body>
+</html>
